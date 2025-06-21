@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Generator Pengalaman Belajar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card-enter {
+            animation: card-enter 0.5s ease-out;
+        }
+        @keyframes card-enter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Custom scrollbar for better UX */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .loader {
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .prose .step-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: #1e3a8a; /* dark blue */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <!-- Login Page -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+            <div class="text-center mb-8">
+                <img src="https://gmtzbgbhxhrhymkfcytj.supabase.co/storage/v1/object/public/file.pel4tihan//Logo%20Baru%20Komunitas%20GuruPintar.png" alt="Logo Komunitas GuruPintar" class="h-20 w-20 mx-auto mb-4 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/80x80/e2e8f0/64748b?text=Logo';">
+                <h1 class="text-2xl font-bold text-slate-900">Generator Pengalaman Belajar</h1>
+                <p class="text-slate-500 mt-2">Silakan login untuk melanjutkan</p>
+            </div>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-slate-700 mb-1">Nama Pengguna</label>
+                    <input type="text" id="username" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                </div>
+                
+                <div id="login-error" class="hidden mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    Nama Pengguna atau Password salah. Silakan coba lagi.
+                </div>
+
+                <button type="submit" id="login-btn" class="w-full bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 flex items-center justify-center">
+                    <span id="login-btn-text">Login</span>
+                    <div id="login-loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-5 w-5 ml-2 hidden"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application (Initially Hidden) -->
+    <div id="main-app" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Header Section -->
+            <header class="mb-6">
+                <nav class="flex justify-between items-center mb-2">
+                    <div class="flex items-center gap-4">
+                        <img src="https://gmtzbgbhxhrhymkfcytj.supabase.co/storage/v1/object/public/file.pel4tihan//Logo%20Baru%20Komunitas%20GuruPintar.png" alt="Logo Komunitas GuruPintar" class="h-12 w-12 md:h-14 md:w-14 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/60x60/e2e8f0/64748b?text=Logo';">
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-slate-900">Generator Pengalaman Belajar</h1>
+                            <p class="text-xs md:text-sm text-slate-500">Dirancang dengan sepenuh hati dan pikiran oleh Sofyan Andi, S.Si.</p>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="flex items-center gap-2 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                           <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </nav>
+                <hr class="border-slate-200 mt-2">
+            </header>
+
+            <div class="max-w-4xl mx-auto mb-8">
+                <p id="welcome-message" class="text-xl text-slate-800"></p>
+            </div>
+
+            <!-- Main Content Area -->
+            <main class="max-w-4xl mx-auto">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h2 class="text-2xl font-semibold mb-6 text-slate-800">Detail Pembelajaran</h2>
+                    <form id="learning-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-slate-700 mb-1">Mata Pelajaran</label>
+                            <input type="text" id="subject" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-900" placeholder="Contoh: Sejarah Indonesia" value="Sejarah Indonesia">
+                        </div>
+                        <div>
+                            <label for="grade" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
+                            <input type="text" id="grade" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-900" placeholder="Contoh: 11" value="11">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="topic" class="block text-sm font-medium text-slate-700 mb-1">Topik / Materi</label>
+                            <input type="text" id="topic" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-900" placeholder="Contoh: Proklamasi Kemerdekaan Indonesia" value="Proklamasi Kemerdekaan Indonesia">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="objective" class="block text-sm font-medium text-slate-700 mb-1">Tujuan Pembelajaran</label>
+                            <textarea id="objective" rows="3" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition custom-scrollbar text-slate-900" placeholder="Contoh: Peserta didik mampu menganalisis makna dan pentingnya Proklamasi Kemerdekaan bagi bangsa Indonesia.">Peserta didik mampu menganalisis makna dan pentingnya Proklamasi Kemerdekaan bagi bangsa Indonesia.</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="method" class="block text-sm font-medium text-slate-700 mb-1">Metode / Model Pembelajaran</label>
+                            <input type="text" id="method" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-900" placeholder="Contoh: Discovery Learning, Project-Based Learning" value="Discovery Learning">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="notes" class="block text-sm font-medium text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
+                            <textarea id="notes" rows="2" class="w-full px-4 py-2 bg-slate-100 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition custom-scrollbar text-slate-900" placeholder="Contoh: Fokuskan pada peran pemuda atau gunakan studi kasus lokal."></textarea>
+                        </div>
+                        <div class="md:col-span-2 text-center mt-4">
+                            <button type="submit" id="generate-btn" class="w-full md:w-auto bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center mx-auto">
+                                <svg id="generate-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" /></svg>
+                                <span id="generate-btn-text">Generate Aktivitas</span>
+                                <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 ml-2 hidden"></div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="error-box" class="hidden mt-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
+                    <strong class="font-bold">Oops!</strong>
+                    <span class="block sm:inline" id="error-message">Terjadi kesalahan. Silakan coba lagi.</span>
+                </div>
+
+                <div id="output-section" class="mt-10 grid grid-cols-1 md:grid-cols-1 gap-8 hidden">
+                    <div id="memahami-card" class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-sky-700">Tahap Memahami (Kegiatan Inti)</h3>
+                            <button class="copy-btn bg-slate-200 text-slate-700 hover:bg-slate-300 text-sm font-medium py-2 px-4 rounded-lg transition" data-target="memahami-output">Salin</button>
+                        </div>
+                        <div id="memahami-output" class="text-slate-700 prose max-w-none"></div>
+                    </div>
+                    <div id="menerapkan-card" class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-emerald-700">Tahap Menerapkan</h3>
+                            <button class="copy-btn bg-slate-200 text-slate-700 hover:bg-slate-300 text-sm font-medium py-2 px-4 rounded-lg transition" data-target="menerapkan-output">Salin</button>
+                        </div>
+                        <div id="menerapkan-output" class="text-slate-700 prose max-w-none"></div>
+                    </div>
+                    <div id="merefleksikan-card" class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-amber-700">Tahap Merefleksikan</h3>
+                            <button class="copy-btn bg-slate-200 text-slate-700 hover:bg-slate-300 text-sm font-medium py-2 px-4 rounded-lg transition" data-target="merefleksikan-output">Salin</button>
+                        </div>
+                        <div id="merefleksikan-output" class="text-slate-700 prose max-w-none"></div>
+                    </div>
+                </div>
+            </main>
+            
+            <footer class="mt-12 text-center">
+                <p class="text-sm text-slate-500">Copyright © 2025 Komunitas Belajar GuruPintar</p>
+            </footer>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // --- PAGE REFERENCES ---
+        const loginPage = document.getElementById('login-page');
+        const mainApp = document.getElementById('main-app');
+
+        // --- LOGIN REFERENCES ---
+        const loginForm = document.getElementById('login-form');
+        const loginBtn = document.getElementById('login-btn');
+        const loginBtnText = document.getElementById('login-btn-text');
+        const loginLoader = document.getElementById('login-loader');
+        const loginError = document.getElementById('login-error');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        // --- MAIN APP REFERENCES ---
+        const logoutBtn = document.getElementById('logout-btn');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const learningForm = document.getElementById('learning-form');
+        const generateBtn = document.getElementById('generate-btn');
+        const generateBtnText = document.getElementById('generate-btn-text');
+        const loader = document.getElementById('loader');
+        const errorBox = document.getElementById('error-box');
+        const errorMessage = document.getElementById('error-message');
+        const outputSection = document.getElementById('output-section');
+        const memahamiOutput = document.getElementById('memahami-output');
+        const menerapkanOutput = document.getElementById('menerapkan-output');
+        const merefleksikanOutput = document.getElementById('merefleksikan-output');
+        const notesInput = document.getElementById('notes');
+
+        // --- LOGOUT LOGIC ---
+        logoutBtn.addEventListener('click', () => {
+            mainApp.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            usernameInput.value = '';
+            passwordInput.value = '';
+            loginError.classList.add('hidden');
+            welcomeMessage.innerHTML = ''; 
+        });
+
+
+        // --- LOGIN LOGIC ---
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzrLRJTWGPViAvoxLbgE1A6rMGjubIN70hUEfcLVAK6VfkNI-cc85EzRdEdzn3F-sQt_fa8qCLrBlW/pub?gid=0&single=true&output=csv';
+
+        function parseCSV(text) {
+            const lines = text.trim().split(/\r?\n/);
+            const header = lines[0].split(',').map(h => h.trim());
+            const users = [];
+            for (let i = 1; i < lines.length; i++) {
+                const data = lines[i].split(',').map(d => d.trim());
+                if (data.length === header.length) {
+                    const user = {};
+                    for (let j = 0; j < header.length; j++) {
+                        user[header[j]] = data[j];
+                    }
+                    users.push(user);
+                }
+            }
+            return users;
+        }
+
+        function checkCredentials(users, username, password) {
+            return users.some(user => user['Nama Pengguna'] === username && user['Password'] === password);
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginBtn.disabled = true;
+            loginBtnText.classList.add('hidden');
+            loginLoader.classList.remove('hidden');
+            loginError.classList.add('hidden');
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            try {
+                const response = await fetch(CSV_URL);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data pengguna dari server.');
+                }
+                const csvText = await response.text();
+                const users = parseCSV(csvText);
+                const isValid = checkCredentials(users, username, password);
+
+                if (isValid) {
+                    loginPage.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    welcomeMessage.innerHTML = `Selamat datang, <span class="font-semibold">${username}</span>!`;
+                } else {
+                    loginError.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                loginError.textContent = 'Terjadi kesalahan. Periksa koneksi internet Anda.';
+                loginError.classList.remove('hidden');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtnText.classList.remove('hidden');
+                loginLoader.classList.add('hidden');
+            }
+        });
+
+
+        // --- MAIN APP LOGIC ---
+        learningForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const subject = document.getElementById('subject').value.trim();
+            const grade = document.getElementById('grade').value.trim();
+            const topic = document.getElementById('topic').value.trim();
+            const objective = document.getElementById('objective').value.trim();
+            const method = document.getElementById('method').value.trim();
+            const notes = notesInput.value.trim();
+
+            if (!subject || !grade || !topic || !objective || !method) {
+                showError("Harap isi semua kolom wajib untuk hasil terbaik.");
+                return;
+            }
+
+            setLoading(true);
+            hideError();
+            outputSection.classList.add('hidden');
+
+            const prompt = createPrompt(subject, grade, topic, objective, method, notes);
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { 
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "memahami": { "type": "STRING" },
+                                "menerapkan": { "type": "STRING" },
+                                "merefleksikan": { "type": "STRING" }
+                            },
+                            required: ["memahami", "menerapkan", "merefleksikan"]
+                        }
+                    }
+                };
+                const apiKey = "AIzaSyDe1tSWwVjhSsKkpmbiAxrrD4mrDD1DChc"; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                         throw new Error("Autentikasi Gagal (Error 401). Harap periksa konfigurasi Kunci API Anda.");
+                    }
+                    throw new Error(`Panggilan API gagal dengan status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    const generatedJsonText = result.candidates[0].content.parts[0].text;
+                    const activities = JSON.parse(generatedJsonText);
+                    displayResults(activities);
+                } else {
+                    throw new Error("Gagal memproses respons dari AI. Mungkin output terpotong.");
+                }
+
+            } catch (error) {
+                console.error('Generation error:', error);
+                showError(error.message || "Terjadi kesalahan saat menghasilkan konten. Coba lagi.");
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        function createPrompt(subject, grade, topic, objective, method, notes) {
+            const notesInstruction = notes ? `\n**CATATAN PENTING DARI PENGGUNA:**\n${notes}\nPastikan untuk mengintegrasikan catatan ini ke dalam rancangan aktivitas yang Anda buat.` : "";
+
+            return `
+                Sebagai seorang ahli perancang desain pembelajaran yang inovatif, buatlah proposal aktivitas untuk tiga tahapan pengalaman belajar berdasarkan detail berikut. Hasilkan output dalam format JSON dengan kunci "memahami", "menerapkan", dan "merefleksikan". Isi setiap kunci dengan deskripsi aktivitas yang relevan, detail, dan kreatif dalam format Markdown.
+
+                **Detail Pembelajaran:**
+                - **Mata Pelajaran:** ${subject}
+                - **Kelas:** ${grade}
+                - **Topik/Materi:** ${topic}
+                - **Tujuan Pembelajaran:** ${objective}
+                - **Metode/Model Pembelajaran:** ${method}
+                ${notesInstruction}
+
+                **Instruksi Khusus untuk Setiap Tahapan & Integrasi Prinsip BBM:**
+
+                1.  **Tahap Memahami (sebagai Kegiatan Inti):**
+                    * **Struktur:** Rancang sebagai **urutan langkah-langkah pembelajaran**. Format setiap langkah dengan judul tebal seperti \`**Langkah 1: Judul Aktivitas**\`.
+                    * **Detail:** Di bawah setiap judul langkah, detailkan **Aktivitas Guru** dan **Aktivitas Siswa**.
+                    * **Konten:** Pastikan **materi yang konkret** dan **asesmen formatif awal** terintegrasi.
+                    * **Prinsip BBM:** Jelaskan keterkaitan dengan prinsip **Berkesadaran** dan **Bermakna**.
+
+                2.  **Tahap Menerapkan:**
+                    * **Struktur:** Rancang dalam **langkah-langkah nyata yang detail dan spesifik**. Gunakan format \`**Langkah 1: Judul Proyek/Tantangan**\`, \`**Langkah 2: Proses Pengerjaan**\`, dst.
+                    * **Fokus:** Langkah-langkah harus menunjukkan bagaimana siswa menerapkan pengetahuan untuk **mencapai kompetensi** dalam skenario **bermakna dan kontekstual**.
+                    * **Detail:** Jelaskan peran guru sebagai fasilitator dan aktivitas siswa dalam mengerjakan proyek.
+                    * **Prinsip BBM:** Jelaskan bagaimana aktivitas ini **Bermakna** dan **Menggembirakan**.
+
+                3.  **Tahap Merefleksikan:**
+                    * **Struktur Wajib:** Pilih **salah satu** aktivitas refleksi yang bervariasi (contoh: Gallery Walk, Metode 3-2-1, Surat untuk Diri Sendiri, Peta Konsep Reflektif), lalu **uraikan aktivitas tersebut ke dalam langkah-langkah yang jelas**. Gunakan format \`**Langkah 1: Pengantar Refleksi**\`, \`**Langkah 2: Proses Inti Refleksi**\`, dst.
+                    * **Detail Setiap Langkah:** Untuk setiap langkah yang Anda buat, WAJIB detailkan **Aktivitas Guru** (sebagai fasilitator refleksi) dan **Aktivitas Siswa** (proses yang mereka lakukan).
+                    * **Fokus Ganda:** Pastikan langkah-langkah tersebut secara eksplisit memandu siswa untuk melakukan **Self-Reflection** (apa yang saya pahami/rasakan?) dan **Self-Regulation** (apa langkah saya selanjutnya?).
+                    * **Prinsip BBM:** Jelaskan bagaimana keseluruhan aktivitas refleksi ini menumbuhkan **Berkesadaran** (mindful).
+                
+                **PERINTAH FINAL PENTING:** Pastikan seluruh konten untuk setiap kunci ("memahami", "menerapkan", "merefleksikan") dihasilkan secara lengkap dan utuh tanpa terpotong sama sekali. Pastikan output akhir adalah sebuah string JSON yang valid dan lengkap.
+            `;
+        }
+        
+        function displayResults(activities) {
+            const mdToHtml = (md) => {
+                let html = md;
+                 html = html.replace(/\*\*(Langkah \d+:.*?)\*\*/g, '<div class="step-title mt-5">$1</div>');
+                html = html.replace(/\*\*(Keterkaitan dengan Prinsip BBM:)\*\*/g, '<h4 class="text-md font-semibold mt-6 mb-2 text-slate-800">$1</h4>');
+                html = html.replace(/\*\*(Aktivitas Guru:|Aktivitas Siswa:)\*\*/g, '<strong class="text-slate-900">$1</strong>');
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                html = html.replace(/^- (.*$)/gim, '<li class="ml-4 mb-1 list-disc">$1</li>');
+                html = html.replace(/(<li.*<\/li>)/gs, '<ul>$1</ul>');
+                html = html.replace(/\n/g, '<br>');
+                html = html.replace(/<\/ul><br>/g, '</ul>');
+                html = html.replace(/<br><div class="step-title/g, '<div class="step-title');
+                html = html.replace(/<\/div><br>/g, '</div>');
+                return html;
+            };
+
+            memahamiOutput.innerHTML = mdToHtml(activities.memahami || "");
+            menerapkanOutput.innerHTML = mdToHtml(activities.menerapkan || "");
+            merefleksikanOutput.innerHTML = mdToHtml(activities.merefleksikan || "");
+            
+            outputSection.classList.remove('hidden');
+            ['memahami-card', 'menerapkan-card', 'merefleksikan-card'].forEach(id => {
+                document.getElementById(id).classList.add('card-enter');
+            });
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                generateBtn.disabled = true;
+                generateBtnText.textContent = "Menghasilkan...";
+                loader.classList.remove('hidden');
+            } else {
+                generateBtn.disabled = false;
+                generateBtnText.textContent = "Generate Aktivitas";
+                loader.classList.add('hidden');
+            }
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorBox.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorBox.classList.add('hidden');
+        }
+
+        outputSection.addEventListener('click', (e) => {
+            if (e.target.classList.contains('copy-btn')) {
+                const button = e.target;
+                const targetId = button.dataset.target;
+                const contentElement = document.getElementById(targetId);
+                
+                const textArea = document.createElement('textarea');
+                textArea.value = contentElement.innerText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    button.textContent = 'Tersalin!';
+                    button.classList.add('bg-green-500', 'text-white');
+                    setTimeout(() => {
+                        button.textContent = 'Salin';
+                        button.classList.remove('bg-green-500', 'text-white');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Gagal menyalin teks:', err);
+                    button.textContent = 'Gagal';
+                     setTimeout(() => {
+                        button.textContent = 'Salin';
+                    }, 2000);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+    </script>
+</body>
+</html>
